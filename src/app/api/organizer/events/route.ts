@@ -15,10 +15,13 @@ export async function POST(req: Request) {
     include: {
       bookings: {
         where: {
-          status: 'CONFIRMED'
+          status: {
+            in: ['CONFIRMED', 'CHECKED_IN']
+          }
         },
         select: {
-          quantity: true
+          quantity: true,
+          status: true
         }
       }
     },
@@ -28,10 +31,13 @@ export async function POST(req: Request) {
   })
 
   const result = events.map(event => {
-    const booked = event.bookings.reduce(
-      (sum, b) => sum + b.quantity,
-      0
-    )
+    const booked = event.bookings
+      .filter(b => b.status === 'CONFIRMED')
+      .reduce((sum, b) => sum + b.quantity, 0)
+
+    const checkedIn = event.bookings
+      .filter(b => b.status === 'CHECKED_IN')
+      .reduce((sum, b) => sum + b.quantity, 0)
 
     return {
       id: event.id,
@@ -39,7 +45,8 @@ export async function POST(req: Request) {
       date: event.date,
       capacity: event.capacity,
       booked,
-      remaining: event.capacity - booked,
+      checkedIn,
+      remaining: event.capacity - booked - checkedIn,
       isDeleted: event.isDeleted
     }
   })

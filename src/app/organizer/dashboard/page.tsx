@@ -18,6 +18,7 @@ type OrganizerEvent = {
   booked: number
   remaining: number
   isDeleted: boolean
+  checkedIn: number
 }
 
 export default function OrganizerDashboardPage() {
@@ -116,9 +117,14 @@ export default function OrganizerDashboardPage() {
                     </span>
                   </div>
 
-                  <p className="mb-2 text-xs text-gray-600">
-                    {event.booked} / {event.capacity} booked
+                  <p className="mb-1 text-xs text-gray-600">
+                    {event.booked + event.checkedIn} / {event.capacity} tickets used
                   </p>
+
+                  <p className="text-xs text-gray-500">
+                    {event.checkedIn} checked in
+                  </p>
+
 
                   <div className="h-2 w-full overflow-hidden rounded bg-gray-200">
                     <div
