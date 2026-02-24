@@ -7,6 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ORGANIZER
+  ADMIN
+}
+
+model User {
+  id         String   @id  // ← REMOVE @default(uuid())
+  email      String   @unique
+  role       Role     @default(USER)
+  createdAt  DateTime @default(now())
+
+  events      Event[]      @relation("OrganizerEvents")
+  bookings    Booking[]
+  savedEvents SavedEvent[]
+}
+
 model Event {
   id          String   @id @default(uuid())
   title       String
@@ -21,10 +38,11 @@ model Event {
   capacity    Int
   isHiddenGem Boolean  @default(false)
   createdAt   DateTime @default(now())
+  isDeleted   Boolean  @default(false)
 
   organizerId String
-  isDeleted   Boolean  @default(false)
-  
+  organizer   User     @relation("OrganizerEvents", fields: [organizerId], references: [id])
+
   savedEvents SavedEvent[]
   bookings    Booking[]
 }
@@ -35,6 +53,7 @@ model SavedEvent {
   eventId   String
   createdAt DateTime @default(now())
 
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([userId, eventId])
@@ -42,7 +61,7 @@ model SavedEvent {
 
 model Booking {
   id        String   @id @default(uuid())
-  ticketId  String  @unique
+  ticketId  String   @unique
   userId    String
   eventId   String
   quantity  Int
@@ -50,9 +69,8 @@ model Booking {
   status    String   @default("CONFIRMED")
   createdAt DateTime @default(now())
 
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
-
-

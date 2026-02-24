@@ -28,19 +28,27 @@ export default function OrganizerDashboardPage() {
   useEffect(() => {
     async function load() {
       const {
-        data: { user }
-      } = await supabase.auth.getUser()
+        data: { session }
+      } = await supabase.auth.getSession()
 
-      if (!user) {
+      if (!session) {
         router.replace('/login')
         return
       }
 
+      const token = session.access_token
+
       const res = await fetch('/api/organizer/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id })
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
+
+      if (!res.ok) {
+        router.replace('/')
+        return
+      }
 
       const data = await res.json()
       setEvents(data)
@@ -57,8 +65,17 @@ export default function OrganizerDashboardPage() {
 
     if (!confirmed) return
 
+    const {
+      data: { session }
+    } = await supabase.auth.getSession()
+
+    if (!session) return
+
     const res = await fetch(`/api/events/${eventId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
     })
 
     if (res.ok) {
@@ -142,7 +159,6 @@ export default function OrganizerDashboardPage() {
                     : 'Sold out'}
                 </p>
 
-                {/* Actions */}
                 <div className="mt-3 flex items-center gap-4">
                   {event.isDeleted ? (
                     <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">
@@ -150,7 +166,6 @@ export default function OrganizerDashboardPage() {
                     </span>
                   ) : (
                     <>
-                      {/* NEW: Scan button */}
                       <button
                         onClick={() =>
                           router.push(
