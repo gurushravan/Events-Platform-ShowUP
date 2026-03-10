@@ -1,6 +1,30 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+async function getCoordinates(venue: string, city: string) {
+  const query = encodeURIComponent(`${venue} ${city}`)
+
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`,
+    {
+      headers: {
+        'User-Agent': 'events-platform'
+      }
+    }
+  )
+
+  const data = await res.json()
+
+  if (!data || data.length === 0) {
+    return { lat: null, lon: null }
+  }
+
+  return {
+    lat: parseFloat(data[0].lat),
+    lon: parseFloat(data[0].lon)
+  }
+}
+
 export async function POST(req: Request) {
   const body = await req.json()
 
@@ -26,10 +50,10 @@ export async function POST(req: Request) {
     !date ||
     !startTime ||
     !endTime ||
-    !price ||
+    price === undefined ||
     !venue ||
     !city ||
-    !capacity ||
+    capacity === undefined ||
     !organizerId
   ) {
     return NextResponse.json(
@@ -37,6 +61,20 @@ export async function POST(req: Request) {
       { status: 400 }
     )
   }
+
+  // Ensure the user exists
+  const user = await prisma.user.upsert({
+    where: { id: organizerId },
+    update: {},
+    create: {
+      id: organizerId,
+      email: 'temp@email.com',
+      role: 'ORGANIZER'
+    }
+  })
+
+  // Get coordinates for venue
+  const { lat, lon } = await getCoordinates(venue, city)
 
   const event = await prisma.event.create({
     data: {
@@ -51,7 +89,9 @@ export async function POST(req: Request) {
       city,
       capacity: Number(capacity),
       isHiddenGem: Boolean(isHiddenGem),
-      organizerId
+      organizerId: user.id,
+      latitude: lat,
+      longitude: lon
     }
   })
 

@@ -40,6 +40,9 @@ model Event {
   createdAt   DateTime @default(now())
   isDeleted   Boolean  @default(false)
 
+  latitude    Float?
+  longitude   Float?
+
   organizerId String
   organizer   User     @relation("OrganizerEvents", fields: [organizerId], references: [id])
 

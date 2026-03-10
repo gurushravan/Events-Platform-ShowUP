@@ -3,7 +3,6 @@ import HeroSearch from '@/components/home/HeroSearch'
 import ExploreResults from '@/components/explore/ExploreResults'
 
 export default async function HomePage() {
-  // ⏱️ Filter out past events
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -16,7 +15,24 @@ export default async function HomePage() {
         }
       },
       take: 6,
-      orderBy: { date: 'asc' }
+      orderBy: { date: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        price: true,
+        venue: true,
+        city: true,
+        capacity: true,
+        isHiddenGem: true,
+        createdAt: true,
+        latitude: true,
+        longitude: true
+      }
     }),
 
     prisma.event.findMany({
@@ -28,7 +44,24 @@ export default async function HomePage() {
         }
       },
       take: 6,
-      orderBy: { date: 'asc' }
+      orderBy: { date: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        price: true,
+        venue: true,
+        city: true,
+        capacity: true,
+        isHiddenGem: true,
+        createdAt: true,
+        latitude: true,
+        longitude: true
+      }
     }),
 
     prisma.event.findMany({
@@ -39,7 +72,24 @@ export default async function HomePage() {
         }
       },
       take: 6,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        date: true,
+        startTime: true,
+        endTime: true,
+        price: true,
+        venue: true,
+        city: true,
+        capacity: true,
+        isHiddenGem: true,
+        createdAt: true,
+        latitude: true,
+        longitude: true
+      }
     })
   ])
 
@@ -47,7 +97,6 @@ export default async function HomePage() {
     <main>
       <HeroSearch />
 
-      {/* Happening Near You */}
       <section className="mx-auto max-w-7xl px-4 py-8 text-white">
         <h2 className="mb-4 text-lg font-semibold">
           Happening Near You
@@ -56,7 +105,6 @@ export default async function HomePage() {
         <ExploreResults events={nearbyEvents} />
       </section>
 
-      {/* Hidden Gems */}
       {hiddenGems.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-8 text-white">
           <h2 className="mb-4 text-lg font-semibold">
@@ -67,7 +115,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Browse by Category */}
       <section className="mx-auto max-w-7xl px-4 py-8 text-white">
         <h2 className="mb-4 text-lg font-semibold">
           Browse by Category
@@ -100,7 +147,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Recently Added */}
       <section className="mx-auto max-w-7xl px-4 py-8 text-white">
         <h2 className="mb-4 text-lg font-semibold">
           Recently Added
