@@ -3,39 +3,34 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(req: Request) {
   try {
-    const { bookingId } = await req.json()
+    let userId: string | null = null
+    let eventId: string | null = null
 
-    if (!bookingId) {
-      return NextResponse.json(
-        { error: 'Missing bookingId' },
-        { status: 400 }
-      )
+    try {
+      const body = await req.json()
+      userId = body?.userId ?? null
+      eventId = body?.eventId ?? null
+    } catch {
+      userId = null
+      eventId = null
     }
 
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        event: {
-          select: {
-            title: true,
-            date: true,
-            venue: true
-          }
-        }
+    if (!userId || !eventId) {
+      return NextResponse.json({
+        booked: false
+      })
+    }
+
+    const booking = await prisma.booking.findFirst({
+      where: {
+        userId,
+        eventId,
+        status: 'CONFIRMED'
       }
     })
 
-    if (!booking) {
-      return NextResponse.json(
-        { error: 'Booking not found' },
-        { status: 404 }
-      )
-    }
-
     return NextResponse.json({
-      id: booking.id,
-      ticketId: booking.ticketId,
-      event: booking.event
+      booked: !!booking
     })
   } catch (error) {
     return NextResponse.json(

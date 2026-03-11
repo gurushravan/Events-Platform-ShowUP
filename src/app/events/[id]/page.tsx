@@ -27,8 +27,19 @@ export default async function EventDetailsPage(
 
   return (
     <>
-
       <main className="mx-auto max-w-7xl px-4 py-6 text-white">
+
+        {/* EVENT IMAGE */}
+       {event.imageUrl && (
+          <div className="mb-6 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center">
+            <img
+              src={event.imageUrl}
+              alt={event.title}
+              className="max-h-96 w-auto object-contain"
+            />
+          </div>
+        )}
+
         <div className="flex items-start justify-between">
           <EventHeader
             title={event.title}
@@ -67,8 +78,6 @@ export default async function EventDetailsPage(
           </EventActions>
         </div>
       </main>
-
-
     </>
   )
 }

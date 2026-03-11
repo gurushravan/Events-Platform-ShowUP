@@ -28,7 +28,20 @@ export async function GET(
     )
   }
 
-  return NextResponse.json(event)
+  // count confirmed bookings
+  const confirmedBookings = await prisma.booking.count({
+    where: {
+      eventId: id,
+      status: 'CONFIRMED'
+    }
+  })
+
+  const remaining = Math.max(event.capacity - confirmedBookings, 0)
+
+  return NextResponse.json({
+    ...event,
+    remaining
+  })
 }
 
 async function authenticate(req: Request) {
@@ -69,7 +82,6 @@ export async function PUT(
     )
   }
 
-  // 🔒 RBAC + Ownership check
   if (
     dbUser.role !== 'ADMIN' &&
     event.organizerId !== dbUser.id
@@ -127,7 +139,6 @@ export async function DELETE(
     )
   }
 
-  // 🔒 RBAC + Ownership check
   if (
     dbUser.role !== 'ADMIN' &&
     event.organizerId !== dbUser.id

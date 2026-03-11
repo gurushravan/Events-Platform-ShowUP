@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 async function getCoordinates(venue: string, city: string) {
   const query = encodeURIComponent(`${venue} ${city}`)
@@ -26,22 +32,21 @@ async function getCoordinates(venue: string, city: string) {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json()
+  const formData = await req.formData()
 
-  const {
-    title,
-    description,
-    category,
-    date,
-    startTime,
-    endTime,
-    price,
-    venue,
-    city,
-    capacity,
-    isHiddenGem,
-    organizerId
-  } = body
+  const title = formData.get('title') as string
+  const description = formData.get('description') as string
+  const category = formData.get('category') as string
+  const date = formData.get('date') as string
+  const startTime = formData.get('startTime') as string
+  const endTime = formData.get('endTime') as string
+  const price = formData.get('price') as string
+  const venue = formData.get('venue') as string
+  const city = formData.get('city') as string
+  const capacity = formData.get('capacity') as string
+  const isHiddenGem = formData.get('isHiddenGem') === 'true'
+  const organizerId = formData.get('organizerId') as string
+  const image = formData.get('image') as File | null
 
   if (
     !title ||
@@ -50,10 +55,10 @@ export async function POST(req: Request) {
     !date ||
     !startTime ||
     !endTime ||
-    price === undefined ||
+    !price ||
     !venue ||
     !city ||
-    capacity === undefined ||
+    !capacity ||
     !organizerId
   ) {
     return NextResponse.json(
@@ -62,7 +67,20 @@ export async function POST(req: Request) {
     )
   }
 
-  // Ensure the user exists
+  let imageUrl: string | null = null
+
+  if (image && image.size > 0) {
+    const fileName = `${Date.now()}-${image.name}`
+
+    const { error } = await supabase.storage
+      .from('event-images')
+      .upload(fileName, image)
+
+    if (!error) {
+      imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/event-images/${fileName}`
+    }
+  }
+
   const user = await prisma.user.upsert({
     where: { id: organizerId },
     update: {},
@@ -73,7 +91,6 @@ export async function POST(req: Request) {
     }
   })
 
-  // Get coordinates for venue
   const { lat, lon } = await getCoordinates(venue, city)
 
   const event = await prisma.event.create({
@@ -88,10 +105,11 @@ export async function POST(req: Request) {
       venue,
       city,
       capacity: Number(capacity),
-      isHiddenGem: Boolean(isHiddenGem),
+      isHiddenGem,
       organizerId: user.id,
       latitude: lat,
-      longitude: lon
+      longitude: lon,
+      imageUrl
     }
   })
 

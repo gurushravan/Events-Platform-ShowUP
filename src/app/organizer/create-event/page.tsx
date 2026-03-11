@@ -42,28 +42,15 @@ export default function CreateEventPage() {
       return
     }
 
-    const formData = new FormData(e.target as HTMLFormElement)
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
 
-    const payload = {
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      category: formData.get('category') as string,
-      date: formData.get('date') as string,
-      startTime: formData.get('startTime') as string,
-      endTime: formData.get('endTime') as string,
-      price: Number(formData.get('price')),
-      venue: formData.get('venue') as string,
-      city: formData.get('city') as string,
-      capacity: Number(formData.get('capacity')),
-      isHiddenGem: formData.get('isHiddenGem') === 'on',
-      organizerId: user.id
-    }
+    // attach organizer id
+    formData.append('organizerId', user.id)
 
     const res = await fetch('/api/events/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(payload)
+      body: formData
     })
 
     if (res.ok) {
@@ -156,6 +143,23 @@ export default function CreateEventPage() {
           required
           className="w-full rounded border px-3 py-2"
         />
+
+        {/* IMAGE UPLOAD */}
+        <div>
+          <label className="block text-sm mb-1">
+            Event image
+          </label>
+
+          <label className="inline-block cursor-pointer rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800">
+            Choose file
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              className="hidden"
+            />
+          </label>
+        </div>
 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="isHiddenGem" />
