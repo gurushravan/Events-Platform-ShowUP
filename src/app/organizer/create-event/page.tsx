@@ -144,7 +144,6 @@ export default function CreateEventPage() {
           className="w-full rounded border px-3 py-2"
         />
 
-        {/* IMAGE UPLOAD */}
         <div>
           <label className="block text-sm mb-1">
             Event image

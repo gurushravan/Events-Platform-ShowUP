@@ -2,9 +2,8 @@
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
-
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('en-IN', {
@@ -26,7 +25,7 @@ type BookingData = {
   event: EventData | null
 }
 
-export default function BookingSuccessPage() {
+function BookingSuccessContent() {
   const searchParams = useSearchParams()
   const bookingId = searchParams.get('bookingId')
 
@@ -64,7 +63,7 @@ export default function BookingSuccessPage() {
           ticketId: data.ticketId,
           event: data.event ?? null
         })
-      } catch (err) {
+      } catch {
         setError('Unable to load booking details')
       } finally {
         setLoading(false)
@@ -146,5 +145,13 @@ export default function BookingSuccessPage() {
         </Link>
       </div>
     </main>
+  )
+}
+
+export default function BookingSuccessPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-10">Loading…</div>}>
+      <BookingSuccessContent />
+    </Suspense>
   )
 }
