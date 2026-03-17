@@ -1,36 +1,171 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Event Management Platform
 
-## Getting Started
+## Overview
 
-First, run the development server:
+This is a full-stack event management platform that allows users to browse events, organizers to manage events, and users to register for them. The application is built using modern web technologies with a focus on scalability, clean UI, and efficient data handling.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Features
+
+* User authentication (via Supabase)
+* Event listing and browsing
+* Organizer-based event management
+* Event registration system
+* Image upload support for events
+* Distance calculation for events based on user location
+* Responsive UI for desktop and mobile
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* Next.js
+* React.js
+* Tailwind CSS
+
+### Backend
+
+* Next.js API routes
+* Prisma ORM
+
+### Database
+
+* PostgreSQL (via Supabase)
+
+### Authentication
+
+* Supabase Auth
+
+### Deployment
+
+* Vercel
+
+---
+
+## Project Structure
+
+```
+root/
+│── app/                  # Next.js app directory
+│── components/           # Reusable UI components
+│── lib/                  # Utility functions and configs
+│── prisma/               # Prisma schema and seed file
+│── public/               # Static assets
+│── styles/               # Global styles
+│── .env                  # Environment variables
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env` file in the root directory and add the following:
 
-## Learn More
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+DATABASE_URL=your_database_url
+```
 
-To learn more about Next.js, take a look at the following resources:
+Note: Do not expose the service role key publicly.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Installation and Setup
 
-## Deploy on Vercel
+1. Clone the repository
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+git clone <your-repo-url>
+cd <project-folder>
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Install dependencies
+
+```
+npm install
+```
+
+3. Setup environment variables
+
+4. Run database migrations
+
+```
+npx prisma migrate dev
+```
+
+5. Seed the database
+
+```
+node prisma/seed.js
+```
+
+6. Start development server
+
+```
+npm run dev
+```
+
+---
+
+## Deployment
+
+The project is deployed using Vercel.
+
+Steps:
+
+1. Push code to GitHub
+2. Import project into Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
+
+---
+
+## Key Functionalities
+
+### Event Management
+
+* Create, update, and delete events
+* Associate events with organizers
+
+### User Flow
+
+* Users can browse events
+* Users can register for events
+
+### Authentication Flow
+
+* Managed via Supabase
+* Users are created and stored in the database
+
+---
+
+## Known Issues
+
+* Ensure environment variables are correctly configured during deployment
+* Public keys (NEXT_PUBLIC) are exposed in frontend, verify safety
+
+---
+
+## Future Improvements
+
+* Payment integration for paid events
+* Advanced filtering and search
+* Admin dashboard
+* Email notifications
+
+---
+
+## License
+
+This project is for educational and personal use.
+
+---
+
+## Author
+
+Developed as part of a full-stack learning project.
